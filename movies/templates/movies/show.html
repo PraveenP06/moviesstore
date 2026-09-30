@@ -8,6 +8,23 @@
         <h2>{{ template_data.movie.name }}</h2>
         <hr />
         <p><b>Description:</b> {{ template_data.movie.description }}</p>
+        <p><b>Average Rating:</b> {{ template_data.average_rating }}</p>
+        {% if user.is_authenticated %}
+        <p><b>Your rating:</b> {{ template_data.user_rating.rating }} </p>
+        <form method="POST" 
+          action="{% url 'movies.create_rating' id=template_data.movie.id %}">
+          {% csrf_token %}
+          <select name="rating">
+            <option value="1">1 Star</option>
+            <option value="2">2 Star</option>
+            <option value="3">3 Star</option>
+            <option value="4">4 Star</option>
+            <option value="5">5 Star</option>
+          </select>
+          <button type="submit" class="btn bg-dark text-white"> Rate </button>
+        </form>
+        {% endif %}
+          
         <p><b>Price:</b> ${{ template_data.movie.price }}</p>
         <p class="card-text">
           <form method="post"
