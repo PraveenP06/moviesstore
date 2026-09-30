@@ -1,0 +1,12 @@
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+<div id="content-main">
+  {% if top_user %}
+  <p><strong>{{ top_user.username }}</strong> has purchased the most movies:</p>
+  <p><strong>{{ top_user.movie_count }}</strong> movie{{ top_user.movie_count|pluralize }} purchased.</p>
+  {% else %}
+  <p>No regular users have purchased movies yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

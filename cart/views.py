@@ -4,6 +4,9 @@ from movies.models import Movie
 from .utils import calculate_cart_total
 from .models import Order, Item
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin import site as admin_site
+from django.contrib.auth.models import User
+from django.db.models import Sum
 
 # Create your views here.
 def index(request):
@@ -56,3 +59,16 @@ def purchase(request):
     template_data['order_id'] = order.id
     return render(request, 'cart/purchase.html',
         {'template_data': template_data})
+
+
+def purchase_leader(request):
+    top_user = (User.objects.filter(is_staff=False, order__item__isnull=False)
+        .annotate(movie_count=Sum('order__item__quantity'))
+        .order_by('-movie_count', 'username', 'pk')
+        .first())
+    context = admin_site.each_context(request)
+    context.update({
+        'title': 'Top purchasing user',
+        'top_user': top_user,
+    })
+    return render(request, 'cart/admin_purchase_leader.html', context)
