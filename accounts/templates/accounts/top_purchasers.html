@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{# Inherits the navbar, footer and Boostrap like every other page #}
+{% block content %}
+
+<div class="p-3">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col mx-auto mb-3">
+        <h2>Top Purchasers</h2>
+        <hr />
+
+        <form method = "GET" class = "row g-2 align-items-end mb-3">
+            <div class= "col-auto">
+                <label for = "list_size" class = "form-label">List size (leave blank for all users)</label>
+                <input id = "list_size" type = "number" min = "1" name = "list_size"
+                            class = "form-control" value = "{{template_data.list_size_input}}" >
+            </div>
+            <div class = "col-auto">
+                <button type = "sumbit" class = "btn bg-dark text-white">Apply</button>
+            </div>
+            <div class = "col-auto">
+                <a href = "{% url 'accounts.top_purchasers' %}" class = "btn btn-outline-secondary" > Show all</a>
+            </div>
+        </form>
+        {% if tempate_data.error %}
+        <div class = "alert alert-warning" role = "alert">{{template_date.error}}</div>
+        {% endif %}
+
+        <p class = "text-muted">
+            {% if template_data.list_size %}
+                Showing the top {{template_data.list_size}} user {{ template_data.list.size|pluralize}}.
+            {% else %}
+                Showing all users.
+            {% endif %}
+        </p>
+
+        <table class="table table-bordered table-striped text-center">
+        <thead>
+          <tr>
+            <th scope="col">Rank</th>
+            <th scope="col">Username</th>
+            <th scope="col">Movies Purchased</th>
+            <th scope="col">Orders</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for u in template_data.users %}
+            <tr>
+                <td>{{ forloop.counter}}</td>
+                <td>{{u.username}}</td>
+                <td>{{u.purchase_count}}</td>
+                <td>{{u.prder_count}}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan = "4"> No users found.</td></tr>
+            {%endfor%}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{%endblock content%}
