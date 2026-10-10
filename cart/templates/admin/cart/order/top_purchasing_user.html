@@ -1,0 +1,36 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+<div class = "breadcrumbs">
+    <a href = "{% url 'admin:index' %}"> Home </a>
+    &rsaquo; <a href = "{% url 'admin:app_list' app_label='cart' %}"> Cart</a>
+    &rsaquo; <a href = "{% url 'admin:cart_order_changelist' %}"> Orders</a>
+    &rsaquo; Top Purchasing User
+</div>
+
+{%endblock %}
+
+{% block content %}
+    {% if leaders %}
+    <p> Number of movies purchased: <strong>{{ movies_purchased }}</strong></p>
+
+    <table>
+        <thead>
+            <tr>
+                <th scope = "col"> User</th>
+                <th scope = "col"> Movies Purchased</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for leader in leaders%}
+            <tr>
+                <td> {{ leader.order__user__username }}</td>
+                <td> {{ leader.movies_purchased }}</td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+    {%else %}
+    <p> No movies have been purchased yet.</p>
+    {%endif%}
+    {% endblock%}

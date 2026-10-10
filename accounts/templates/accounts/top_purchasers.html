@@ -16,21 +16,21 @@
                             class = "form-control" value = "{{template_data.list_size_input}}" >
             </div>
             <div class = "col-auto">
-                <button type = "sumbit" class = "btn bg-dark text-white">Apply</button>
+                <button type = "submit" class = "btn bg-dark text-white">Apply</button>
             </div>
             <div class = "col-auto">
                 <a href = "{% url 'accounts.top_purchasers' %}" class = "btn btn-outline-secondary" > Show all</a>
             </div>
         </form>
-        {% if tempate_data.error %}
-        <div class = "alert alert-warning" role = "alert">{{template_date.error}}</div>
+        {% if template_data.error %}
+        <div class = "alert alert-warning" role = "alert">{{ template_data.error }}</div>
         {% endif %}
 
         <p class = "text-muted">
             {% if template_data.list_size %}
-                Showing the top {{template_data.list_size}} user {{ template_data.list.size|pluralize}}.
+                Showing the top {{ template_data.list_size }} user{{ template_data.list_size|pluralize }}.
             {% else %}
-                Showing all users.
+                Showing all regular users.
             {% endif %}
         </p>
 
@@ -49,7 +49,7 @@
                 <td>{{ forloop.counter}}</td>
                 <td>{{u.username}}</td>
                 <td>{{u.purchase_count}}</td>
-                <td>{{u.prder_count}}</td>
+                <td>{{ u.order_count }}</td>
             </tr>
             {% empty %}
             <tr><td colspan = "4"> No users found.</td></tr>
