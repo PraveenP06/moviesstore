@@ -4,8 +4,9 @@ from .forms import CustomUserCreationForm, CustomErrorList
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
 from django.db.models.functions import Coalesce
+from movies.models import Movie
 
 
 # Create your views here.
@@ -92,4 +93,34 @@ def top_purchasers(request):
     template_data['error'] = error
 
     return render(request, 'accounts/top_purchasers.html', {'template_data': template_data})
+
+@login_required
+def movie_stats(request):
+    if not request.user.is_staff:
+        return redirect('home.index')
+
+    # Two separate queries on purpose: annotating Sum and Count in the same
+    # query joins items x reviews and inflates both numbers.
+    bought = Movie.objects.annotate(
+        times_bought=Sum('item__quantity')
+    ).filter(times_bought__gt=0)
+    reviewed = Movie.objects.annotate(
+        times_reviewed=Count('review', filter=Q(review__offensive=False))
+    ).filter(times_reviewed__gt=0)
+
+    # Find the top count, then keep every movie tied at that count.
+    top_bought = bought.order_by('-times_bought').first()
+    top_reviewed = reviewed.order_by('-times_reviewed').first()
+    most_bought = []
+    most_reviewed = []
+    if top_bought:
+        most_bought = bought.filter(times_bought=top_bought.times_bought).order_by('name')
+    if top_reviewed:
+        most_reviewed = reviewed.filter(times_reviewed=top_reviewed.times_reviewed).order_by('name')
+
+    template_data = {}
+    template_data['title'] = 'Movie Stats'
+    template_data['most_bought'] = most_bought
+    template_data['most_reviewed'] = most_reviewed
+    return render(request, 'accounts/movie_stats.html', {'template_data': template_data})
 

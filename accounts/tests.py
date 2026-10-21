@@ -53,3 +53,56 @@ class TopPurchasersTests(TestCase):
         response = self.client.get(url, {'list_size': '1'})
         self.assertContains(response, 'Showing the top 1 user.')
         self.assertEqual(len(response.context['template_data']['users']), 1)
+
+
+class MovieStatsTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.staff = User.objects.create_superuser('admin', password='password')
+        cls.user = User.objects.create_user('user', password='password')
+        cls.movie_a = Movie.objects.create(
+            name='Movie A', price=10, description='Example',
+            image='movie_images/example.jpg',
+        )
+        cls.movie_b = Movie.objects.create(
+            name='Movie B', price=10, description='Example',
+            image='movie_images/example.jpg',
+        )
+
+    def purchase(self, movie):
+        self.client.force_login(self.user)
+        session = self.client.session
+        session['cart'] = {str(movie.id): '1'}
+        session.save()
+        self.assertEqual(self.client.get(reverse('cart.purchase')).status_code, 200)
+
+    def get_stats(self):
+        self.client.force_login(self.staff)
+        response = self.client.get(reverse('accounts.movie_stats'))
+        self.assertEqual(response.status_code, 200)
+        return response.context['template_data']
+
+    def test_story_scenario(self):
+        # Comment on movie A and purchase it: A tops both lists.
+        self.client.force_login(self.user)
+        self.client.post(
+            reverse('movies.create_review', args=[self.movie_a.id]),
+            {'comment': 'Great movie'},
+        )
+        self.purchase(self.movie_a)
+        stats = self.get_stats()
+        self.assertEqual([(m.name, m.times_bought) for m in stats['most_bought']], [('Movie A', 1)])
+        self.assertEqual([(m.name, m.times_reviewed) for m in stats['most_reviewed']], [('Movie A', 1)])
+
+        # Purchase movie B twice: B is most bought, A is still most reviewed.
+        self.purchase(self.movie_b)
+        self.purchase(self.movie_b)
+        stats = self.get_stats()
+        self.assertEqual([(m.name, m.times_bought) for m in stats['most_bought']], [('Movie B', 2)])
+        self.assertEqual([(m.name, m.times_reviewed) for m in stats['most_reviewed']], [('Movie A', 1)])
+
+    def test_only_staff_can_view_stats(self):
+        url = reverse('accounts.movie_stats')
+        self.assertEqual(self.client.get(url).status_code, 302)
+        self.client.force_login(self.user)
+        self.assertRedirects(self.client.get(url), reverse('home.index'))
