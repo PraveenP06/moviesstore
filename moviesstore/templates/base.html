@@ -44,6 +44,9 @@
               <a class="nav-link" 
               href = "{% url 'accounts.movie_stats' %}"> Movie Stats
             </a>
+              <a class="nav-link"
+              href="{% url 'accounts.top_commenters' %}">Top Commenters
+            </a>
             {% endif %}
             <a class="nav-link"
               href="{% url 'accounts.logout' %}">Logout ({{ user.username }})</a>
