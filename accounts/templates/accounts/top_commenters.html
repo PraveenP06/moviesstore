@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-3">
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col mx-auto mb-3">
+                <h2>Top Commenters</h2>
+                <hr />
+                <p class="text-muted">
+                    Regular users ranked by the number of movie comments posted.
+                </p>
+                <table class="table table-bordered table-striped text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Comments Posted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user_account in template_data.users %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ user_account.username }}</td>
+                            <td>{{ user_account.comment_count }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">No comments have been posted yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

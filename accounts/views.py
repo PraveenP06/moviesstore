@@ -95,6 +95,33 @@ def top_purchasers(request):
     return render(request, 'accounts/top_purchasers.html', {'template_data': template_data})
 
 @login_required
+def top_commenters(request):
+    if not request.user.is_staff:
+        return redirect('home.index')
+
+    users = User.objects.filter(
+        is_staff=False,
+        is_superuser=False
+    ).annotate(
+        comment_count=Count('review')
+    ).filter(
+        comment_count__gt=0
+    ).order_by(
+        '-comment_count',
+        'username'
+    )
+
+    template_data = {}
+    template_data['title'] = 'Top Commenters'
+    template_data['users'] = users
+
+    return render(
+        request,
+        'accounts/top_commenters.html',
+        {'template_data': template_data}
+    )
+
+@login_required
 def movie_stats(request):
     if not request.user.is_staff:
         return redirect('home.index')

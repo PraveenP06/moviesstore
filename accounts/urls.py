@@ -6,5 +6,6 @@ urlpatterns = [
     path('logout/', views.logout, name='accounts.logout'),
     path('orders/', views.orders, name='accounts.orders'),
     path('top-purchasers/', views.top_purchasers, name = 'accounts.top_purchasers'),
+    path('top-commenters/', views.top_commenters, name = 'accounts.top_commenters'),
     path('movie-stats/', views.movie_stats, name='accounts.movie_stats')
 ]
